@@ -6,6 +6,8 @@ be used for this.
 
 # TODO
 
+Solve: how to play .mp3 from the URL from JSON, or download the file and play it? What's the best way to do this?
+
 Write the program first in Python and then figure out how to turn that into an
 Android app. I want to learn how to Python -> Android app. Paying attention to
 creating an effortless user experience.
