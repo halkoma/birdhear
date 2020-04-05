@@ -13,6 +13,8 @@ import time
 
 import requests
 import vlc
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
 
 def play_audio(audio_file):
     """Play audio of the length of the audio_file"""
@@ -24,14 +26,46 @@ def play_audio(audio_file):
     time.sleep(duration)
 
 def main():
-    bird_name = re.sub(r"\s+", '+', input('Bird name: ').lower().strip())
+    bird_name = re.sub(r"\s+", ' ', input('Bird name: ').lower().strip())
+#    bird_name = 'harakka'
+    payload = {'query': bird_name}
 
     try:
-        resp = requests.get('https://www.xeno-canto.org/api/2/recordings?query=' + bird_name)
-        #audio_file = resp.json()['recordings'][500]['file']
-        recordings = resp.json()['recordings']
-        audio_file = random.choice(recordings)['file']
-    except Exception as e:
+        try:
+            resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
+                                params=payload)
+            recordings = resp.json()['recordings']
+            audio_file = random.choice(recordings)['file']
+            print (resp.json()['name'])
+        except Exception:
+            options = Options()
+            options.headless = True
+            driver = webdriver.Firefox(options=options,
+                                executable_path=r'/usr/local/bin/geckodriver')
+            driver.get("https://www.knutas.com/birdsearch/")
+
+            search_box = driver.find_element_by_xpath("//input")
+
+            # we loop the characters, because with "copy/paste" method 
+            # it's too fast and sometimes doesn't work. 
+            # have to wait a little bit before the last character 
+            for i in bird_name[:-1]:
+                search_box.send_keys(i)
+            time.sleep(0.5) # let it render
+            search_box.send_keys(bird_name[-1])
+            time.sleep(0.5) # wait again, i know. the api works weirdly...
+            search_box.click()
+            scientific_name = driver.find_element_by_xpath(
+                                             "//td/div/sub/i").text.lower()
+            print(scientific_name)
+            driver.close()
+
+            payload = {'query': scientific_name}
+            resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
+                                params=payload)
+            recordings = resp.json()['recordings']
+            audio_file = random.choice(recordings)['file']
+    except Exception:
         print("Check the bird name")
         sys.exit()
 
