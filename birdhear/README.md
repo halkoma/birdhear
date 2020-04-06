@@ -6,21 +6,20 @@ be used for this.
 
 # TODO
 
-Solve: how to play .mp3 from the URL from JSON, or download the file and play it? What's the best way to do this?
-
 Write the program first in Python and then figure out how to turn that into an
 Android app. I want to learn how to Python -> Android app. Paying attention to
 creating an effortless user experience.
 
 ## The program
 
-Ask the user for input:
+Ask the user for input and:
+    1. Try to fetch the bird from xeno-canto.
+    2. If fetching fails, translate the bird name to its scientific name 
+    and fetch with that
+    3. Play the sound recording
 
-- TODO 1. Bird name
-    - Would be cool to have a database of the names stored and give suggestions
-      – typing on phone is not fun 
-    - Maybe get the info regarding the bird at this point while user is
-      selecting the next one?
-- TODO 2. Vocalization
-- (3. User experience: maybe no need to have a "listen" button but play
-  automatically instead)
+- TODO: for optimization, it's probably better to always translate – even if
+a scientific name is searched. This is to avoid making excess requests to the
+xeno-canto API.
+
+- TODO: Vocalization
