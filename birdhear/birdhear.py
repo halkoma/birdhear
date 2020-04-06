@@ -43,6 +43,7 @@ def main():
             driver = webdriver.Firefox(options=options,
                                 executable_path=r'/usr/local/bin/geckodriver')
             driver.get("https://www.knutas.com/birdsearch/")
+            time.sleep(0.5) # let it render
 
             search_box = driver.find_element_by_xpath("//input")
 
@@ -51,9 +52,8 @@ def main():
             # have to wait a little bit before the last character 
             for i in bird_name[:-1]:
                 search_box.send_keys(i)
-            time.sleep(0.5) # let it render
+            time.sleep(1.5) # let it render before the last char
             search_box.send_keys(bird_name[-1])
-            time.sleep(0.5) # wait again, i know. the api works weirdly...
             search_box.click()
             scientific_name = driver.find_element_by_xpath(
                                              "//td/div/sub/i").text.lower()
