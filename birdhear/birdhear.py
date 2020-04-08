@@ -27,8 +27,9 @@ def play_audio(audio_file):
 
 def main():
     bird_name = re.sub(r"\s+", ' ', input('Bird name: ').lower().strip())
+    bird_type = re.sub(r"\s+", ' ', input('Bird type: ').lower().strip())
 #    bird_name = 'harakka'
-    payload = {'query': bird_name}
+    payload = {'query': bird_name, 'type': bird_type}
 
     try:
         try:
@@ -36,7 +37,7 @@ def main():
                                 params=payload)
             recordings = resp.json()['recordings']
             audio_file = random.choice(recordings)['file']
-            print (resp.json()['name'])
+            print(resp.json()['name'])
         except Exception:
             options = Options()
             options.headless = True
@@ -60,7 +61,7 @@ def main():
             print(scientific_name)
             driver.close()
 
-            payload = {'query': scientific_name}
+            payload = {'query': scientific_name, 'type': bird_type}
             resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
                                 params=payload)
             recordings = resp.json()['recordings']
