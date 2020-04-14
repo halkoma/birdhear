@@ -5,6 +5,8 @@
 
 Using the API https://www.xeno-canto.org/explore/api
 For the translations: https://avibase.bsc-eoc.org/
+
+TODO: after bird name input, list possible types so the user can choose
 """
 
 import random
@@ -36,12 +38,18 @@ def get_sc_name(bird_name):
 
     tree = html.fromstring(page.content)
 
-    #TODO fix the problem of some birds (korppi, kaulushaikara) leading to an info page 
-    tbody = tree.xpath('//table[@class="table-striped"]')[0]
+    try:
+        tbody = tree.xpath('//table[@class="table-striped"]')[0]
 
-    for tr in tbody[1:]:
-        if tr[-1].text == None and '[' not in tr[-2][0].text:
-            return_name = tr[-2][0].text.lower()
+        for tr in tbody[1:]:
+            if '[' not in tr[-2][0].text:
+                return_name = tr[-2][0].text.lower()
+                break
+    except:
+        # some birds lead to an info page, hence handling like this 
+        h4 = tree.xpath('//div[@class="section w-100"]/h4')
+        return_name = h4[0][0].text.lower()
+
     return return_name
 
 def get_audio(scientific_name, bird_type):
@@ -80,19 +88,19 @@ def main():
     bird_name = re.sub(r"\s+", ' ', input('Bird name: ').lower().strip())
     bird_type = re.sub(r"\s+", ' ', input('Bird type: ').lower().strip())
     print()
-#    bird_name = 'punarinta'
+#    bird_name = 'kaulushaikara'
 #    bird_type = ''
 
-#    try:
-    scientific_name = get_sc_name(bird_name)
-    print(bird_name, ":", scientific_name)
-    if bird_type:
-        print("type".ljust(len(bird_name)), ":", bird_type)
-    audio_file = get_audio(scientific_name, bird_type)
-    play_audio(audio_file)
-#    except Exception as e:
-#        print("Check the bird name or the type")
-#        sys.exit()
+    try:
+        scientific_name = get_sc_name(bird_name)
+        print(bird_name, ":", scientific_name)
+        if bird_type:
+            print("type".ljust(len(bird_name)), ":", bird_type)
+        audio_file = get_audio(scientific_name, bird_type)
+        play_audio(audio_file)
+    except Exception as e:
+        print("Check the bird name or type")
+        sys.exit()
 
 if __name__== "__main__":
     main()
