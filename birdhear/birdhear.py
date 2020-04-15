@@ -7,6 +7,13 @@ Using the API https://www.xeno-canto.org/explore/api
 For the translations: https://avibase.bsc-eoc.org/
 
 TODO: after bird name input, list possible types so the user can choose
+    ... apparently there are too many types to list them all for the user
+        this is because those who add recordings can choose what the type is
+        like "'tik tik', night call".
+        TODO: make the user choose from:
+            song
+            call
+            other (may contain also songs and calls)
 """
 
 import random
