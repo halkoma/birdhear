@@ -59,24 +59,22 @@ def get_sc_name(bird_name):
 
     return return_name
 
-def get_audio(scientific_name, bird_type):
+def get_audio(scientific_name, bird_type, recordings):
     """Return random audio file to be played.
 
     Strip away recordings < 5s
     If type given, filter by that"""
-    payload = {'query': scientific_name}
-    resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
-                        params=payload)
-    recordings = resp.json()['recordings']
 
     if bird_type:
         longer_recs = strip_short_recs(recordings)
         r_by_type = [r for r in longer_recs if r['type'] == bird_type]
         audio_file = random.choice(r_by_type)['file']
+        return random.choice(r_by_type)['file']
     else:
         longer_recs = strip_short_recs(recordings)
         audio_file = random.choice(longer_recs)['file']
-    return audio_file
+        return audio_file
+    return random.choice(bird)['file']
 
 def strip_short_recs(recs):
     """Strip away recordings < 5s"""
@@ -91,23 +89,70 @@ def strip_short_recs(recs):
             continue
     return return_recs
 
-def main():
-    bird_name = re.sub(r"\s+", ' ', input('Bird name: ').lower().strip())
-    bird_type = re.sub(r"\s+", ' ', input('Bird type: ').lower().strip())
-    print()
-#    bird_name = 'kaulushaikara'
-#    bird_type = ''
+def get_bird(recordings):
+    longer_recs = strip_short_recs(recordings)
+    return longer_recs
 
-    try:
-        scientific_name = get_sc_name(bird_name)
-        print(bird_name, ":", scientific_name)
-        if bird_type:
-            print("type".ljust(len(bird_name)), ":", bird_type)
-        audio_file = get_audio(scientific_name, bird_type)
-        play_audio(audio_file)
-    except Exception as e:
-        print("Check the bird name or type")
-        sys.exit()
+def get_types(birds):
+    types = {
+        'call': [],
+        'song': [],
+        'other': []
+    }
+
+    for btype in birds:
+        bt = btype['type']
+        if bt == 'song':
+            types['song'].append(btype)
+        elif bt == 'call':
+            types['call'].append(btype)
+        else:
+            types['other'].append(btype)
+    return(types)
+
+def main():
+#    bird_name = re.sub(r"\s+", ' ', input('Bird name: ').lower().strip())
+    print()
+    bird_name = 'punarinta'
+    bird_type = ''
+
+#    try:
+    scientific_name = get_sc_name(bird_name)
+
+    payload = {'query': scientific_name}
+    resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
+                        params=payload)
+    recordings = resp.json()['recordings']
+
+    birds = get_bird(recordings)
+    bird_by_types = get_types(birds)
+
+    bird_type = re.sub(r"\s+", ' ', input(
+        'Choose bird type from:\nsong\ncall\nother\n> ')).lower().strip()
+
+    if bird_type == 'song':
+        bird = random.choice(bird_by_types['song'])
+        audio_file = bird['file']
+    elif bird_type == 'call':
+        bird = random.choice(bird_by_types['call'])
+        audio_file = bird['file']
+    elif bird_type == 'other':
+        bird = random.choice(bird_by_types['other'])
+        audio_file = bird['file']
+#    else:
+#        bird = random.choice(birds)['file']
+    TODO fix everythin
+
+    print(bird_name, ":", scientific_name)
+    if bird_type:
+        print("type".ljust(len(bird_name)), ":", bird['type'])
+#    audio_file = get_audio(scientific_name, bird_type, recordings)
+#    print(audio_file)
+    play_audio(audio_file)
+#
+#    except Exception as e:
+#        print("Check the bird name or type")
+#        sys.exit()
 
 if __name__== "__main__":
     main()
