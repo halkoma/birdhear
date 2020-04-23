@@ -104,12 +104,19 @@ def get_random_bird(birds_by_types, bird_type):
 
 def ask_type(birds):
     print_types = "\n"
-    for i in birds:
-        if birds[i]:
-            print_types = print_types + i + '\n'
-    print_types = print_types + 'random: press enter' + '\n'
-    bird_type = re.sub(r"\s+", ' ', input(
-        'Choose bird type from: ' + print_types + "> ")).lower().strip()
+    bird_type = ""
+    isEmpty = [bool(i) for i in list(birds.values())]
+    # make sure bird has recordings
+    if True in isEmpty:
+        if birds:
+            for i in birds:
+                if birds[i]:
+                    print_types = print_types + i + '\n'
+            print_types = print_types + 'random: press enter' + '\n'
+            bird_type = re.sub(r"\s+", ' ', input(
+                'Choose bird type from: ' + print_types + "> ")).lower().strip()
+            if bird_type == 'o':
+                bird_type = 'other'
     return bird_type
 
 def print_results(scientific_name, bird_name, random_bird):
