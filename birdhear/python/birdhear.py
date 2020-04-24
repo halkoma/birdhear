@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# -*- coding: utf-8 -*-
 
 """Play a bird sound by name and type (optional)
 
@@ -17,14 +16,20 @@ import requests
 from lxml import html
 import vlc
 
-def play_audio(audio_file):
+def play_audio(audio_file, birds):
     """Play audio of the length of the audio_file"""
-    p = vlc.MediaPlayer('https:' + audio_file)
-    # play the whole mp3
-    p.play()
-    time.sleep(1)
-    duration = p.get_length() / 1000
-    time.sleep(duration)
+    try:
+        p = vlc.MediaPlayer('https:' + audio_file)
+        p.play()
+        print('stop playing: ctrl+c')
+        time.sleep(1)
+        duration = p.get_length() / 1000
+        time.sleep(duration)
+        p.stop()
+    except KeyboardInterrupt:
+        p.stop()
+        return
+
 
 def get_sc_name(bird_name):
     """Search for translation of bird_name and return its scientific name"""
@@ -110,14 +115,24 @@ def ask_type(birds):
     if True in isEmpty:
         if birds:
             for i in birds:
-                if birds[i]:
-                    print_types = print_types + i + '\n'
-            print_types = print_types + 'random: press enter' + '\n'
-            bird_type = re.sub(r"\s+", ' ', input(
-                'Choose bird type from: ' + print_types + "> ")).lower().strip()
-            if bird_type == 'o':
-                bird_type = 'other'
-    return bird_type
+                print_types = print_types + i[0] + '(' + i[1:] + ')\n'
+            print_types = print_types + 'r(andom)\n' +\
+                                        'exit: enter\n'
+            btype = re.sub(r"\s+", ' ', input(
+                'Choose bird type from:\n' + print_types + "> ")
+                                                            ).lower().strip()
+            print()
+            if btype == 'c':
+                btype = 'call'
+            if btype == 's':
+                btype = 'song'
+            if btype == 'o':
+                btype = 'other'
+            if btype == 'r':
+                btype = 'random'
+            if btype == '' or btype == 'exit':
+                sys.exit("Bye!")
+    return btype
 
 def print_results(scientific_name, bird_name, random_bird):
     print(bird_name, ":", scientific_name)
@@ -132,6 +147,7 @@ def main():
 
     try:
         scientific_name = get_sc_name(bird_name)
+        print(bird_name, ":", scientific_name, "\n")
 
         payload = {'query': scientific_name}
         resp = requests.get('https://www.xeno-canto.org/api/2/recordings',
@@ -139,11 +155,12 @@ def main():
         recordings = resp.json()['recordings']
 
         birds_by_types = get_birds(recordings)
-        bird_type = ask_type(birds_by_types)
-        random_bird = get_random_bird(birds_by_types, bird_type)
-        print_results(scientific_name, bird_name, random_bird)
-        audio_file = random_bird['file']
-        play_audio(audio_file)
+        while True:
+            bird_type = ask_type(birds_by_types)
+            random_bird = get_random_bird(birds_by_types, bird_type)
+            print_results(scientific_name, bird_name, random_bird)
+            audio_file = random_bird['file']
+            play_audio(audio_file, birds_by_types)
     except Exception as e:
         print("Check the bird name or type")
         sys.exit()
