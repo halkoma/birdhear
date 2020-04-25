@@ -30,7 +30,6 @@ def play_audio(audio_file, birds):
         p.stop()
         return
 
-
 def get_sc_name(bird_name):
     """Search for translation of bird_name and return its scientific name"""
 
@@ -41,10 +40,8 @@ def get_sc_name(bird_name):
                'qtype': '0',
                'qinclsp': '2'
               }
-
     page = requests.get('https://avibase.bsc-eoc.org/search.jsp',
                         params=payload)
-
     tree = html.fromstring(page.content)
 
     try:
@@ -94,7 +91,7 @@ def get_types(birds):
             birds_by_types['call'].append(bird)
         else:
             birds_by_types['other'].append(bird)
-    return(birds_by_types)
+    return birds_by_types
 
 def get_random_bird(birds_by_types, bird_type):
     if bird_type == 'song':
@@ -109,29 +106,30 @@ def get_random_bird(birds_by_types, bird_type):
 
 def ask_type(birds):
     print_types = "\n"
-    bird_type = ""
-    isEmpty = [bool(i) for i in list(birds.values())]
+    is_empty = [bool(i) for i in list(birds.values())]
     # make sure bird has recordings
-    if True in isEmpty:
-        if birds:
-            for i in birds:
+    if True in is_empty:
+        for i in birds:
+            # if eg. birds['song'] has values 
+            if birds[i]:
                 print_types = print_types + i[0] + '(' + i[1:] + ')\n'
-            print_types = print_types + 'r(andom)\n' +\
-                                        'exit: enter\n'
-            btype = re.sub(r"\s+", ' ', input(
-                'Choose bird type from:\n' + print_types + "> ")
-                                                            ).lower().strip()
-            print()
-            if btype == 'c':
-                btype = 'call'
-            if btype == 's':
-                btype = 'song'
-            if btype == 'o':
-                btype = 'other'
-            if btype == 'r':
-                btype = 'random'
-            if btype == '' or btype == 'exit':
-                sys.exit("Bye!")
+
+        print_types = print_types + 'r(andom)\n' +\
+                                    'exit: enter\n'
+        btype = re.sub(r"\s+", ' ', input(
+            'Choose bird type from:\n' + print_types + "> ")
+                                                        ).lower().strip()
+        print()
+        if btype == 'c':
+            btype = 'call'
+        if btype == 's':
+            btype = 'song'
+        if btype == 'o':
+            btype = 'other'
+        if btype == 'r':
+            btype = 'random'
+        if btype == '' or btype == 'exit':
+            sys.exit("Bye!")
     return btype
 
 def print_results(scientific_name, bird_name, random_bird):
