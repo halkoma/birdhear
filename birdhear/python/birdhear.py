@@ -122,13 +122,13 @@ def ask_type(birds):
         print()
         if btype == 'c':
             btype = 'call'
-        if btype == 's':
+        elif btype == 's':
             btype = 'song'
-        if btype == 'o':
+        elif btype == 'o':
             btype = 'other'
-        if btype == 'r':
+        elif btype == 'r':
             btype = 'random'
-        if btype == '' or btype == 'exit':
+        else: #btype == '' or btype == 'exit':
             sys.exit("Bye!")
     return btype
 
